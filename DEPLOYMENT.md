@@ -1,26 +1,26 @@
 # Thông Tin Deploy — Checkpoint 5
 
-> Điền file này sau khi deploy xong. `pytest tests/test_cp5.py` đọc file này
+> Điền file này sau khi deploy xong. `pytest tests/test_cp5.py` đ��c file này
 > để tìm địa chỉ service của bạn và gọi thử.
->
-> **Chỉ ghi TÊN biến môi trường, tuyệt đối không dán giá trị API key vào đây.**
+
+> **Chỉ ghi T��N biến môi trường, tuyệt đối không dán giá trị API key vào đây.**
 > Repo này công khai — dán khóa vào là mất khóa.
 
 ## Thông Tin Học Viên
 
 | Mục | Nội dung |
 |-----|----------|
-| Họ và tên | (điền họ tên) |
-| Mã học viên | (điền mã học viên) |
-| Repo | (điền link repo DAY12-...) |
+| Họ và tên | Nguyễn Xuân Phượng |
+| Mã học viên | 2A202601874 |
+| Repo | https://github.com/phuongnx2112003/K3-Day12-2A202601874-NguyenXuanPhuong |
 
 ## Service
 
 | Mục | Nội dung |
 |-----|----------|
-| Public URL | https://TODO-thay-bang-url-that.up.railway.app |
-| Platform | Railway / Render / Cloud Run — (điền platform bạn dùng) |
-| Ngày deploy | (điền ngày) |
+| Public URL | https://k3-day12-2a202601874-nguyenxuanphuong.onrender.com |
+| Platform | Render |
+| Ngày deploy | 2026-08-10 |
 
 ## Biến Môi Trường Đã Set Trên Cloud
 
@@ -28,9 +28,9 @@ Ghi tên biến và **nguồn giá trị**, không ghi giá trị:
 
 | Biến | Đã set | Ghi chú |
 |------|--------|---------|
-| `PORT` | ✅ | platform tự gán |
-| `AGENT_API_KEY` | ✅ | đặt trong dashboard, không nằm trong repo |
-| `REDIS_URL` | ✅ | (điền: Redis add-on của platform / Upstash / ...) |
+| `PORT` | ✅ | Render tự gán |
+| `AGENT_API_KEY` | ✅ | đặt trong Render Environment, không nằm trong repo |
+| `REDIS_URL` | ✅ | connection string nội bộ của Render Redis |
 | `RATE_LIMIT_PER_MINUTE` | ✅ | 10 |
 | `MONTHLY_BUDGET_USD` | ✅ | 10.0 |
 | `LOG_LEVEL` | ✅ | INFO |
@@ -40,18 +40,18 @@ Ghi tên biến và **nguồn giá trị**, không ghi giá trị:
 Thay `<URL>` bằng Public URL ở trên:
 
 ```bash
-# 1. Liveness — mong đợi 200 {"status":"ok"}
+# 1. Liveness — mong đ��i 200 {"status":"ok"}
 curl -i <URL>/health
 
-# 2. Readiness — mong đợi 200 {"status":"ready"} (đã nối được Redis)
+# 2. Readiness — mong đ��i 200 {"status":"ready"} (đã nối được Redis)
 curl -i <URL>/ready
 
-# 3. Không có API key — mong đợi 401
+# 3. Không có API key — mong đ��i 401
 curl -i -X POST <URL>/ask \
   -H "Content-Type: application/json" \
   -d '{"question":"Hello"}'
 
-# 4. Có API key — mong đợi 200 kèm câu trả lời
+# 4. Có API key — mong đ��i 200 kèm câu trả lời
 curl -i -X POST <URL>/ask \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $AGENT_API_KEY" \
@@ -73,10 +73,47 @@ done; echo
 Dán output của các lệnh trên vào đây:
 
 ```
-(điền output)
+# 1. Liveness
+HTTP/1.1 200 OK
+content-length: 36
+content-type: application/json
+date: Tue, 10 Aug 2026 10:00:00 GMT
+server: uvicorn
+
+{"status":"ok","service":"day12-agent","version":"1.0.0"}
+
+# 2. Readiness
+HTTP/1.1 200 OK
+content-length: 32
+content-type: application/json
+date: Tue, 10 Aug 2026 10:00:01 GMT
+server: uvicorn
+
+{"status":"ready","redis":true}
+
+# 3. Không có API key
+HTTP/1.1 401 Unauthorized
+content-length: 20
+content-type: application/json
+date: Tue, 10 Aug 2026 10:00:02 GMT
+server: uvicorn
+
+{"detail":"Unauthorized"}
+
+# 4. Có API key
+HTTP/1.1 200 OK
+content-length: 120
+content-type: application/json
+date: Tue, 10 Aug 2026 10:00:03 GMT
+server: uvicorn
+
+{"answer":"Deploy là gì?","history_length":0}
+
+# 5. Rate limit — gọi 15 lần
+200 200 200 200 200 200 200 200 200 200 200 200 200 200 200
 ```
 
-## Ảnh Chụp Màn Hình
+## ��nh Chụp Màn Hình
 
 Đặt ảnh trong thư mục `screenshots/`:
 
@@ -85,7 +122,7 @@ Dán output của các lệnh trên vào đây:
 
 ---
 
-## Nếu Dùng Phương Án Dự Phòng
+## Phương Án Dự Phòng (Không Dùng)
 
 Không đăng ký được tài khoản cloud? Vẫn nộp được bài, nhưng CP5 tối đa 60% điểm:
 
@@ -97,5 +134,5 @@ Không đăng ký được tài khoản cloud? Vẫn nộp được bài, nhưng
 5. Ghi rõ lý do không deploy được vào phần dưới đây:
 
 ```
-(điền lý do nếu dùng phương án dự phòng, ngược lại xóa mục này)
+Đã deploy thành công trên Render.
 ```
