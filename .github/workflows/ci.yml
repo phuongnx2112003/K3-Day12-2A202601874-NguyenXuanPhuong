@@ -33,14 +33,15 @@ jobs:
     needs: [test, build]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    env:
+      RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+      PUBLIC_URL: ${{ vars.PUBLIC_URL }}
     steps:
       - name: Trigger Render deploy
-        if: secrets.RENDER_DEPLOY_HOOK != ''
-        env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        if: env.RENDER_DEPLOY_HOOK != ''
         run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK"
       - name: Smoke test
-        if: secrets.RENDER_DEPLOY_HOOK != '' && vars.PUBLIC_URL != ''
+        if: env.RENDER_DEPLOY_HOOK != '' && env.PUBLIC_URL != ''
         run: |
           sleep 45
-          curl -fsS "${{ vars.PUBLIC_URL }}/health"
+          curl -fsS "$PUBLIC_URL/health"
