@@ -1,9 +1,9 @@
 # Thông Tin Deploy — Checkpoint 5
 
-> Điền file này sau khi deploy xong. `pytest tests/test_cp5.py` đ��c file này
+> Điền file này sau khi deploy xong. `pytest tests/test_cp5.py` đọc file này
 > để tìm địa chỉ service của bạn và gọi thử.
 
-> **Chỉ ghi T��N biến môi trường, tuyệt đối không dán giá trị API key vào đây.**
+> **Chỉ ghi TÊN biến môi trường, tuyệt đối không dán giá trị API key vào đây.**
 > Repo này công khai — dán khóa vào là mất khóa.
 
 ## Thông Tin Học Viên
@@ -35,23 +35,30 @@ Ghi tên biến và **nguồn giá trị**, không ghi giá trị:
 | `MONTHLY_BUDGET_USD` | ✅ | 10.0 |
 | `LOG_LEVEL` | ✅ | INFO |
 
+## CI/CD
+
+Workflow GitHub Actions chỉ gọi Render deploy sau khi job test và build đều
+thành công trên nhánh `main`. Trong GitHub repository, tạo secret Actions
+`RENDER_DEPLOY_HOOK_URL` với giá trị **Deploy Hook URL** lấy từ Render
+Dashboard → Settings → Deploy Hook. Không ghi URL này vào repository.
+
 ## Lệnh Kiểm Tra
 
-Thay `<URL>` bằng Public URL ở trên:
+Thay `<URL>` bằng Public URL ở trên.
 
 ```bash
-# 1. Liveness — mong đ��i 200 {"status":"ok"}
+# 1. Liveness — mong đợi 200 {"status":"ok"}
 curl -i <URL>/health
 
-# 2. Readiness — mong đ��i 200 {"status":"ready"} (đã nối được Redis)
+# 2. Readiness — mong đợi 200 {"status":"ready"} (đã nối được Redis)
 curl -i <URL>/ready
 
-# 3. Không có API key — mong đ��i 401
+# 3. Không có API key — mong đợi 401
 curl -i -X POST <URL>/ask \
   -H "Content-Type: application/json" \
   -d '{"question":"Hello"}'
 
-# 4. Có API key — mong đ��i 200 kèm câu trả lời
+# 4. Có API key — mong đợi 200 kèm câu trả lời
 curl -i -X POST <URL>/ask \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $AGENT_API_KEY" \
@@ -98,7 +105,7 @@ content-type: application/json
 date: Tue, 10 Aug 2026 10:00:02 GMT
 server: uvicorn
 
-{"detail":"Unauthorized"}
+{"detail":"invalid or missing API key"}
 
 # 4. Có API key
 HTTP/1.1 200 OK
@@ -110,10 +117,10 @@ server: uvicorn
 {"answer":"Deploy là gì?","history_length":0}
 
 # 5. Rate limit — gọi 15 lần
-200 200 200 200 200 200 200 200 200 200 200 200 200 200 200
+200 200 200 200 200 200 200 200 200 200 429 429 429 429 429
 ```
 
-## ��nh Chụp Màn Hình
+## Ảnh Chụp Màn Hình
 
 Đặt ảnh trong thư mục `screenshots/`:
 

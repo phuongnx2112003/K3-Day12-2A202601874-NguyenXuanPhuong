@@ -23,8 +23,18 @@ jobs:
         run: pytest tests/ --ignore=tests/test_cp5.py --ignore=tests/test_bonus_cicd.py
 
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Build Docker image
         run: docker build -t day12-agent:ci .
+
+  deploy:
+    # Không deploy khi mở pull request; chỉ deploy main sau khi test và build xanh.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        run: curl --fail --show-error --request POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
